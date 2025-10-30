@@ -209,6 +209,8 @@ public class Health : MonoBehaviour
     }
 
     [Header("Effects & Polish")]
+    [Tooltip("The Prefab to be spawned in on death.")]
+    public GameObject dropObject = null;
     [Tooltip("The effect to create when this health dies")]
     public GameObject deathEffect;
     [Tooltip("The effect to create when this health is damaged (but does not die)")]
@@ -245,6 +247,14 @@ public class Health : MonoBehaviour
     /// </summary>
     void Die()
     {
+        if (dropObject != null)
+        {
+            // Spawn the gameObject at the object's current position and rotation
+            // took this one from 2dShooter, and I'm pretty sure I got it from the first project
+            //full circle baybee
+            Instantiate(dropObject, transform.position, transform.rotation, null);
+        }
+        
         if (deathEffect != null)
         {
             Instantiate(deathEffect, transform.position, transform.rotation, null);
