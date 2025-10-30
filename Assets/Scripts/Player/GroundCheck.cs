@@ -24,6 +24,7 @@ public class GroundCheck : MonoBehaviour
     // Whether or not the player was grounded last check
     [HideInInspector]
     public bool groundedLastCheck = false;
+    public static List<GroundCheck> allGroundChecks = new List<GroundCheck>();
 
     /// <summary>
     /// Description:
@@ -37,6 +38,26 @@ public class GroundCheck : MonoBehaviour
     {
         // When this component starts up, ensure that the collider is not null, if possible
         GetCollider();
+    }
+
+    private void OnEnable()
+    {
+        allGroundChecks.Add(this);
+    }
+    private void OnDisable()
+    {
+        allGroundChecks.Remove(this);
+    }
+    public bool IsTouchingSurface()
+    {
+        foreach (GroundCheck groundCheck in allGroundChecks)
+        {
+            if (groundCheck.CheckGrounded())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>
@@ -84,52 +105,7 @@ public class GroundCheck : MonoBehaviour
         {
             if (overlapCollider != null)
             {
-                // This line determines if the collider found is on a layer in the ground layer mask
-                // sorry it is so math-heavy
-                int match = contactFilter.layerMask.value & (int)Mathf.Pow(2, overlapCollider.gameObject.layer);
-                if (match > 0)
-                {
-                    if (landingEffect && !groundedLastCheck)
-                    {
-                        Instantiate(landingEffect, transform.position, Quaternion.identity, null);
-                    }
-                    groundedLastCheck = true;
-                    return true;
-                }
-            }
-        }
-        groundedLastCheck = false;
-        return false;
-    }
-    
-    /// <summary>
-    /// Description:
-    /// Checks whether there is a collider overlapping the checking collider which is on a "ground" layer.
-    /// Input: 
-    /// none
-    /// Return: 
-    /// bool
-    /// </summary>
-    /// <returns>bool: Whether or not this collider counts as colliding with a wall</returns>
-    public bool CheckWalled()
-    {
-        // Ensure the collider is assigned
-        if (groundCheckCollider == null)
-        {
-            GetCollider();
-        }
-
-        // Find the colliders that overlap this one
-        Collider2D[] overlaps = new Collider2D[5];
-        ContactFilter2D contactFilter = new ContactFilter2D();
-        contactFilter.layerMask = groundLayers;
-        groundCheckCollider.OverlapCollider(contactFilter, overlaps);
-
-        // Check if one of the overlapping colliders is on the "ground" layer
-        foreach (Collider2D overlapCollider in overlaps)
-        {
-            if (overlapCollider != null)
-            {
+                Debug.Log($"Detected Collider: {overlapCollider.name}");
                 // This line determines if the collider found is on a layer in the ground layer mask
                 // sorry it is so math-heavy
                 int match = contactFilter.layerMask.value & (int)Mathf.Pow(2, overlapCollider.gameObject.layer);
