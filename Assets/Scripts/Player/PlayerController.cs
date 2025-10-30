@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour
         {
             if (groundCheck != null)
             {
-                return groundCheck.CheckGrounded();
+                return groundCheck.IsTouchingSurface();
             }
             else
             {
